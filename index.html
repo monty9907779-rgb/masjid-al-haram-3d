@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المسجد الحرام — معاينة 3D قبل الطباعة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cairo:wght@400;600&display=swap" rel="stylesheet">
+<script type="module" src="model-viewer.min.js"></script>
+<style>
+  :root{--ink:#1d1a14;--gold:#b8862b;--paper:#f4efe4;--line:#d9cfb8}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:Cairo,system-ui,sans-serif}
+  .wrap{display:flex;flex-direction:column;height:100%}
+  header{padding:14px 18px 8px;text-align:center}
+  h1{font-family:Amiri,serif;font-size:clamp(24px,5vw,38px);margin:0;color:var(--ink)}
+  h1 span{color:var(--gold)}
+  .sub{font-size:14px;color:#5b5240;margin-top:2px}
+  model-viewer{flex:1;width:100%;min-height:340px;background:radial-gradient(ellipse at 50% 35%,#fffaf0 0%,#e9e0cc 70%,#d8ccb2 100%);--poster-color:transparent}
+  model-viewer.night{background:radial-gradient(ellipse at 50% 35%,#24304a 0%,#101523 70%,#070a12 100%)}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px 12px}
+  button{font:600 14px Cairo,sans-serif;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:#fffdf7;color:var(--ink);cursor:pointer}
+  button.on{background:var(--ink);color:#f4efe4;border-color:var(--ink)}
+  .specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding:0 14px 14px;max-width:900px;margin:0 auto;width:100%}
+  .spec{background:#fffdf7;border:1px solid var(--line);border-radius:12px;padding:8px 10px;text-align:center}
+  .spec b{display:block;font-size:18px;color:var(--gold)}
+  .spec small{font-size:12px;color:#5b5240}
+  .hint{font-size:12px;color:#5b5240;text-align:center;padding:0 14px 12px}
+  #ar{background:var(--gold);color:#fff;border:none;position:absolute;bottom:14px;left:50%;transform:translateX(-50%)}
+  .load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;color:#5b5240;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>المسجد الحرام <span>۞</span> مكة المكرمة</h1>
+    <div class="sub">معاينة ثلاثية الأبعاد بالمقاس الحقيقي — قلّبها بصباعك أو بالماوس، وقرّب بإصبعين أو بالعجلة</div>
+  </header>
+
+  <model-viewer id="mv" src="Masjid_Al_Haram.glb" ios-src="Masjid_Al_Haram.usdz" ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" 
+    alt="مجسم المسجد الحرام للطباعة ثلاثية الأبعاد"
+    camera-controls auto-rotate auto-rotate-delay="1500" rotation-per-second="18deg"
+    camera-orbit="35deg 62deg 105%" min-camera-orbit="auto 5deg auto" max-camera-orbit="auto 95deg auto"
+    shadow-intensity="1.1" shadow-softness="0.6" exposure="0.85" tone-mapping="aces"
+    environment-image="neutral" interaction-prompt="auto">
+    <button slot="ar-button" id="ar">📱 اعرضه على الترابيزة (AR)</button>
+    <div class="load" slot="progress-bar" id="load">جاري تحميل المجسم…</div>
+  </model-viewer>
+
+  <div class="bar">
+    <button id="spin" class="on">⟳ دوران تلقائي</button>
+    <button data-view="35deg 62deg 105%">منظر أمامي</button>
+    <button data-view="0deg 4deg 110%">من فوق</button>
+    <button data-view="200deg 78deg 70%">من الخلف</button>
+    <button data-view="10deg 70deg 38%" data-target="0m 0.03m 0m">قرّب على الكعبة</button>
+    <button id="night">🌙 وضع الليل</button>
+  </div>
+
+  <div class="specs">
+    <div class="spec"><b>236 × 216 مم</b><small>مقاس القاعدة</small></div>
+    <div class="spec"><b>140 مم</b><small>أعلى ارتفاع (المآذن)</small></div>
+    <div class="spec"><b>4 ألوان</b><small>أبيض · ذهبي · أسود · أخضر</small></div>
+    <div class="spec"><b>Creality K2</b><small>ملف 3MF جاهز — 4 بليتات</small></div>
+  </div>
+  <div class="hint">الألوان هنا تقريبية للخامة. الشكل والمقاسات مطابقة لملف الطباعة نفسه.</div>
+</div>
+<script>
+  const mv = document.getElementById('mv');
+  mv.addEventListener('load', () => { const l = document.getElementById('load'); if (l) l.style.display = 'none'; });
+  mv.addEventListener('progress', e => { const l = document.getElementById('load'); if (l) l.textContent = 'جاري تحميل المجسم… ' + Math.round(e.detail.totalProgress*100) + '%'; });
+  const spin = document.getElementById('spin');
+  spin.onclick = () => { if (mv.hasAttribute('auto-rotate')) { mv.removeAttribute('auto-rotate'); spin.classList.remove('on'); } else { mv.setAttribute('auto-rotate',''); spin.classList.add('on'); } };
+  document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => {
+    mv.cameraOrbit = b.dataset.view; mv.cameraTarget = b.dataset.target || 'auto';
+    mv.removeAttribute('auto-rotate'); spin.classList.remove('on');
+  });
+  const night = document.getElementById('night');
+  night.onclick = () => {
+    const on = mv.classList.toggle('night'); night.classList.toggle('on', on);
+    mv.exposure = on ? 0.5 : 0.85; mv.shadowIntensity = on ? 0.4 : 1.1;
+    night.textContent = on ? '☀️ وضع النهار' : '🌙 وضع الليل';
+  };
+</script>
+</body>
+</html>
