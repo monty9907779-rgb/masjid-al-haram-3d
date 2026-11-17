@@ -40,7 +40,7 @@
   <model-viewer id="mv" src="Masjid_Al_Haram.glb" ios-src="Masjid_Al_Haram.usdz" ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" 
     alt="مجسم المسجد الحرام للطباعة ثلاثية الأبعاد"
     camera-controls auto-rotate auto-rotate-delay="1500" rotation-per-second="18deg"
-    camera-orbit="35deg 62deg 105%" min-camera-orbit="auto 5deg auto" max-camera-orbit="auto 95deg auto"
+    camera-orbit="35deg 62deg 0.75m" camera-target="0m 0.07m 0m" min-camera-orbit="auto 5deg auto" max-camera-orbit="auto 95deg auto"
     shadow-intensity="1.1" shadow-softness="0.6" exposure="0.85" tone-mapping="aces"
     environment-image="neutral" interaction-prompt="auto">
     <button slot="ar-button" id="ar">📱 اعرضه على الترابيزة (AR)</button>
@@ -49,9 +49,9 @@
 
   <div class="bar">
     <button id="spin" class="on">⟳ دوران تلقائي</button>
-    <button data-view="35deg 62deg 105%">منظر أمامي</button>
-    <button data-view="0deg 4deg 110%">من فوق</button>
-    <button data-view="200deg 78deg 70%">من الخلف</button>
+    <button data-view="35deg 62deg 0.75m">منظر أمامي</button>
+    <button data-view="0deg 4deg 0.8m">من فوق</button>
+    <button data-view="200deg 78deg 0.55m">من الخلف</button>
     <button data-view="10deg 70deg 38%" data-target="0m 0.03m 0m">قرّب على الكعبة</button>
     <button id="night">🌙 وضع الليل</button>
   </div>
@@ -66,12 +66,12 @@
 </div>
 <script>
   const mv = document.getElementById('mv');
-  mv.addEventListener('load', () => { const l = document.getElementById('load'); if (l) l.style.display = 'none'; });
+  mv.addEventListener('load', () => { const l = document.getElementById('load'); if (l) l.style.display = 'none'; mv.cameraTarget='0m 0.07m 0m'; mv.cameraOrbit='35deg 62deg 0.75m'; mv.jumpCameraToGoal(); requestAnimationFrame(()=>mv.jumpCameraToGoal()); });
   mv.addEventListener('progress', e => { const l = document.getElementById('load'); if (l) l.textContent = 'جاري تحميل المجسم… ' + Math.round(e.detail.totalProgress*100) + '%'; });
   const spin = document.getElementById('spin');
   spin.onclick = () => { if (mv.hasAttribute('auto-rotate')) { mv.removeAttribute('auto-rotate'); spin.classList.remove('on'); } else { mv.setAttribute('auto-rotate',''); spin.classList.add('on'); } };
   document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => {
-    mv.cameraOrbit = b.dataset.view; mv.cameraTarget = b.dataset.target || 'auto';
+    mv.cameraOrbit = b.dataset.view; mv.cameraTarget = b.dataset.target || '0m 0.07m 0m';
     mv.removeAttribute('auto-rotate'); spin.classList.remove('on');
   });
   const night = document.getElementById('night');
